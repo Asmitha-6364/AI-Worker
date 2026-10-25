@@ -229,31 +229,8 @@ def seed_documents():
 def seed_database():
     """Seed the AcmeOps SQLite database with initial baseline invoices."""
     init_db(force_reset=True)
-
-    # Seed baseline past invoices so the inbox is not empty
-    create_invoice(
-        vendor="Apex Technologies",
-        invoice_number="INV-8410",
-        amount=2700.00,
-        currency="USD",
-        due_date="2026-08-15",
-        issue_date="2026-07-15",
-        description="Cloud Security Assessment & DevOps support",
-        source_channel="SYSTEM_IMPORT",
-    )
-
-    create_invoice(
-        vendor="Global Office Supplies",
-        invoice_number="GOS-1029",
-        amount=435.50,
-        currency="USD",
-        due_date="2026-10-31",
-        issue_date="2026-10-01",
-        description="Ergonomic chairs and desks for Floor 3",
-        source_channel="SYSTEM_IMPORT",
-    )
-
     print(f"Initialized AcmeOps SQLite database at {DB_PATH}")
+
 
 
 if __name__ == "__main__":
