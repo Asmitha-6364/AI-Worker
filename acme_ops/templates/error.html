@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}System Error - AcmeOps{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 600px; margin: 3rem auto; border-left: 4px solid var(--danger);" data-testid="system-error-card">
+  <div class="card-header">
+    <h2 class="card-title" style="color: var(--danger);" data-testid="error-title">HTTP 500 - Internal Server Error</h2>
+  </div>
+  <div class="alert alert-danger" data-testid="error-message">
+    {{ error_message or "A server-side worker database deadlock occurred while processing the form." }}
+  </div>
+  <p class="text-muted" style="font-size: 0.9rem; margin-bottom: 1.5rem;">
+    The web form gateway encountered a transaction lock failure. Automated processes may retry or submit directly via the authenticated REST API endpoint (<code>/api/invoices</code>).
+  </p>
+  <div style="display: flex; gap: 1rem;">
+    <a href="/invoices/new" class="btn btn-secondary" data-testid="btn-retry-form">Retry Form</a>
+    <a href="/invoices" class="btn btn-secondary">Return to Inbox</a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Login - AcmeOps{% endblock %}
+
+{% block content %}
+<div class="login-wrapper">
+  <div class="card" data-testid="login-card">
+    <div class="card-header">
+      <h2 class="card-title">AcmeOps Employee Portal</h2>
+    </div>
+
+    {% if error %}
+      <div class="alert alert-danger" data-testid="login-error">{{ error }}</div>
+    {% endif %}
+
+    <form action="/login" method="POST" data-testid="login-form">
+      <div class="form-group">
+        <label for="username" class="form-label">Username</label>
+        <input type="text" id="username" name="username" class="form-control" placeholder="e.g. admin" required autofocus data-testid="input-username">
+      </div>
+
+      <div class="form-group">
+        <label for="password" class="form-label">Password</label>
+        <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required data-testid="input-password">
+      </div>
+
+      <div style="margin-top: 1.5rem;">
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;" data-testid="btn-login">Sign In</button>
+      </div>
+
+      <div style="margin-top: 1rem; text-align: center; font-size: 0.8rem;" class="text-muted">
+        Default credentials: <code>admin</code> / <code>acmepass123</code>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}AcmeOps - Enterprise Operations{% endblock %}</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="navbar" data-testid="navbar">
+    <a href="/invoices" class="navbar-brand">
+      <span class="logo-badge">ACME</span>
+      <span>AcmeOps ERP</span>
+    </a>
+    <nav class="nav-links">
+      {% if user %}
+        <a href="/invoices" data-testid="nav-invoices" class="{% if active_tab == 'invoices' %}active{% endif %}">Invoices Inbox</a>
+        <a href="/invoices/new" data-testid="nav-new-invoice" class="{% if active_tab == 'new_invoice' %}active{% endif %}">+ Record Invoice</a>
+        <span class="text-muted" style="margin-left: 1rem; font-size: 0.85rem;">Signed in as <strong>{{ user.username }}</strong></span>
+        <a href="/logout" data-testid="nav-logout" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;">Logout</a>
+      {% else %}
+        <a href="/login" data-testid="nav-login">Login</a>
+      {% endif %}
+    </nav>
+  </header>
+
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

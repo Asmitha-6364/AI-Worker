@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Invoice #{{ invoice.id }} - AcmeOps{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 800px; margin: 0 auto;" data-testid="invoice-detail-card">
+  <div class="card-header">
+    <div>
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <h2 class="card-title">Invoice #{{ invoice.id }}</h2>
+        {% if invoice.verified %}
+          <span class="badge badge-verified" data-testid="detail-badge-verified">Verified</span>
+        {% else %}
+          <span class="badge badge-pending" data-testid="detail-badge-pending">Pending Verification</span>
+        {% endif %}
+        <span class="badge badge-channel" data-testid="detail-badge-channel">{{ invoice.source_channel }}</span>
+      </div>
+      <p class="text-muted" style="font-size: 0.85rem; margin-top: 0.25rem;">Recorded on {{ invoice.created_at }}</p>
+    </div>
+    <a href="/invoices" class="btn btn-secondary" data-testid="btn-back-to-inbox">← Back to Inbox</a>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+    <div>
+      <div class="text-muted" style="font-size: 0.8rem; text-transform: uppercase;">Vendor Name</div>
+      <div style="font-size: 1.25rem; font-weight: 700;" data-testid="detail-vendor">{{ invoice.vendor }}</div>
+    </div>
+    <div>
+      <div class="text-muted" style="font-size: 0.8rem; text-transform: uppercase;">Invoice Number</div>
+      <div class="font-mono" style="font-size: 1.25rem; font-weight: 700;" data-testid="detail-invoice-number">{{ invoice.invoice_number }}</div>
+    </div>
+    <div>
+      <div class="text-muted" style="font-size: 0.8rem; text-transform: uppercase;">Total Amount Due</div>
+      <div style="font-size: 1.5rem; font-weight: 800; color: #166534;" data-testid="detail-amount">${{ "%.2f"|format(invoice.amount) }} {{ invoice.currency }}</div>
+    </div>
+    <div>
+      <div class="text-muted" style="font-size: 0.8rem; text-transform: uppercase;">Due Date</div>
+      <div style="font-size: 1.15rem; font-weight: 600;" data-testid="detail-due-date">{{ invoice.due_date }}</div>
+    </div>
+  </div>
+
+  <div style="border-top: 1px solid var(--border); padding-top: 1.25rem; margin-bottom: 1.5rem;">
+    <div class="text-muted" style="font-size: 0.8rem; text-transform: uppercase; margin-bottom: 0.5rem;">Description / Line Items</div>
+    <p style="background: #f8fafc; padding: 1rem; border-radius: 6px; border: 1px solid var(--border);" data-testid="detail-description">
+      {{ invoice.description or "No description provided." }}
+    </p>
+  </div>
+
+  <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 1.25rem;">
+    <div class="text-muted" style="font-size: 0.85rem;">
+      Audit status: <span class="font-mono">DB_ROW_VALIDATED</span>
+    </div>
+    <form action="/invoices/{{ invoice.id }}/verify" method="POST" style="margin: 0;">
+      {% if not invoice.verified %}
+        <button type="submit" class="btn btn-primary" data-testid="btn-mark-verified">Confirm Verification</button>
+      {% endif %}
+    </form>
+  </div>
+</div>
+{% endblock %}

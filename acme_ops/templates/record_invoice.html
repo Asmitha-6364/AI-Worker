@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Record Invoice - AcmeOps{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 800px; margin: 0 auto;" data-testid="record-invoice-card">
+  <div class="card-header">
+    <div>
+      <h2 class="card-title">Record Vendor Bill / Invoice</h2>
+      <p class="text-muted" style="font-size: 0.875rem;">Enter parsed invoice information into AcmeOps Accounts Payable ledger.</p>
+    </div>
+    <a href="/invoices" class="btn btn-secondary" data-testid="btn-cancel">Cancel</a>
+  </div>
+
+  {% if error %}
+    <div class="alert alert-danger" data-testid="form-error-alert">
+      <strong>Error:</strong> {{ error }}
+    </div>
+  {% endif %}
+
+  <form action="/invoices/new" method="POST" data-testid="form-record-invoice">
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="vendor" class="form-label">Vendor Name *</label>
+        <input type="text" id="vendor" name="vendor" class="form-control" placeholder="e.g. Apex Technologies" required value="{{ form_data.vendor if form_data else '' }}" data-testid="input-vendor">
+      </div>
+
+      <div class="form-group">
+        <label for="invoice_number" class="form-label">Invoice Number *</label>
+        <input type="text" id="invoice_number" name="invoice_number" class="form-control font-mono" placeholder="e.g. INV-9821" required value="{{ form_data.invoice_number if form_data else '' }}" data-testid="input-invoice-number">
+      </div>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="amount" class="form-label">Total Amount ($ USD) *</label>
+        <input type="number" step="0.01" id="amount" name="amount" class="form-control" placeholder="0.00" required value="{{ form_data.amount if form_data else '' }}" data-testid="input-amount">
+      </div>
+
+      <div class="form-group">
+        <label for="due_date" class="form-label">Due Date *</label>
+        <input type="date" id="due_date" name="due_date" class="form-control" required value="{{ form_data.due_date if form_data else '' }}" data-testid="input-due-date">
+      </div>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="issue_date" class="form-label">Issue Date (Optional)</label>
+        <input type="date" id="issue_date" name="issue_date" class="form-control" value="{{ form_data.issue_date if form_data else '' }}" data-testid="input-issue-date">
+      </div>
+
+      <div class="form-group">
+        <label for="currency" class="form-label">Currency</label>
+        <select id="currency" name="currency" class="form-control" data-testid="select-currency">
+          <option value="USD" selected>USD - US Dollar</option>
+          <option value="EUR">EUR - Euro</option>
+          <option value="GBP">GBP - British Pound</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="description" class="form-label">Description / Line Items</label>
+      <textarea id="description" name="description" class="form-control" rows="3" placeholder="Brief summary of invoice items..." data-testid="input-description">{{ form_data.description if form_data else '' }}</textarea>
+    </div>
+
+    <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 1rem;">
+      <a href="/invoices" class="btn btn-secondary">Cancel</a>
+      <button type="submit" class="btn btn-primary" data-testid="btn-submit-invoice">Save & Record Invoice</button>
+    </div>
+  </form>
+</div>
+{% endblock %}
