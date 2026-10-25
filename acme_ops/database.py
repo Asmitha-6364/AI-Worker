@@ -85,10 +85,37 @@ def init_db(force_reset: bool = False):
                 (ACME_ADMIN_USERNAME, ACME_ADMIN_PASSWORD, "admin", datetime.utcnow().isoformat())
             )
 
+        # Seed baseline invoices if empty (crucial for fresh serverless instances)
+        cursor.execute("SELECT COUNT(*) as cnt FROM invoices")
+        if cursor.fetchone()["cnt"] == 0:
+            now_iso = datetime.utcnow().isoformat()
+            cursor.execute(
+                """
+                INSERT INTO invoices (vendor, invoice_number, amount, currency, due_date, issue_date, description, status, source_channel, created_at, verified)
+                VALUES ('Apex Technologies', 'INV-8410', 2700.0, 'USD', '2026-08-15', '2026-07-15', 'Cloud Security Assessment', 'PENDING', 'SYSTEM_IMPORT', ?, 0)
+                """,
+                (now_iso,)
+            )
+            cursor.execute(
+                """
+                INSERT INTO invoices (vendor, invoice_number, amount, currency, due_date, issue_date, description, status, source_channel, created_at, verified)
+                VALUES ('Global Office Supplies', 'GOS-1029', 435.50, 'USD', '2026-10-31', '2026-10-01', 'Office Supplies', 'PENDING', 'SYSTEM_IMPORT', ?, 0)
+                """,
+                (now_iso,)
+            )
+
         # Set default system flags
         cursor.execute("INSERT OR IGNORE INTO system_flags (key, value) VALUES ('flaky_ui_submit', '0')")
 
         conn.commit()
+
+
+# Auto-initialize database on module load
+try:
+    init_db()
+except Exception:
+    pass
+
 
 
 def get_flag(key: str, default: str = "0") -> str:

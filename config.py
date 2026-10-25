@@ -1,6 +1,7 @@
 """
 Configuration module for the Autonomous AI Task Worker.
 Loads settings from environment variables with sensible defaults.
+Supports both local execution and Vercel serverless environments.
 """
 
 import os
@@ -10,17 +11,34 @@ from dotenv import load_dotenv
 # Load .env file if present
 load_dotenv()
 
+# Detect serverless environment (Vercel / AWS Lambda)
+IS_SERVERLESS = bool(os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME"))
+
 # Base paths
 BASE_DIR = Path(__file__).resolve().parent
-DOCUMENTS_DIR = BASE_DIR / "documents"
-TRACES_DIR = BASE_DIR / "traces"
-SCREENSHOTS_DIR = TRACES_DIR / "screenshots"
-DB_PATH = BASE_DIR / "acme_ops.db"
 
-# Ensure runtime directories exist
-DOCUMENTS_DIR.mkdir(parents=True, exist_ok=True)
-TRACES_DIR.mkdir(parents=True, exist_ok=True)
-SCREENSHOTS_DIR.mkdir(parents=True, exist_ok=True)
+if IS_SERVERLESS:
+    # On Vercel / Lambda, root filesystem is read-only.
+    # Writable files (SQLite database, traces) must reside in /tmp.
+    DATA_DIR = Path("/tmp")
+    DB_PATH = DATA_DIR / "acme_ops.db"
+    DOCUMENTS_DIR = BASE_DIR / "documents"
+    TRACES_DIR = DATA_DIR / "traces"
+    SCREENSHOTS_DIR = TRACES_DIR / "screenshots"
+else:
+    DOCUMENTS_DIR = BASE_DIR / "documents"
+    TRACES_DIR = BASE_DIR / "traces"
+    SCREENSHOTS_DIR = TRACES_DIR / "screenshots"
+    DB_PATH = BASE_DIR / "acme_ops.db"
+
+# Ensure runtime directories exist safely without throwing on read-only systems
+try:
+    if not IS_SERVERLESS:
+        DOCUMENTS_DIR.mkdir(parents=True, exist_ok=True)
+    TRACES_DIR.mkdir(parents=True, exist_ok=True)
+    SCREENSHOTS_DIR.mkdir(parents=True, exist_ok=True)
+except OSError:
+    pass
 
 # AcmeOps Mock Application Settings
 ACME_HOST = os.getenv("ACME_HOST", "127.0.0.1")
