@@ -17,16 +17,18 @@ def get_connection() -> sqlite3.Connection:
 
 def init_db(force_reset: bool = False):
     """Initialize database tables and seed default users/invoices."""
-    if force_reset and DB_PATH.exists():
-        try:
-            DB_PATH.unlink()
-        except Exception:
-            pass
-
     with get_connection() as conn:
         cursor = conn.cursor()
 
+        if force_reset:
+            cursor.execute("DROP TABLE IF EXISTS audit_logs")
+            cursor.execute("DROP TABLE IF EXISTS invoices")
+            cursor.execute("DROP TABLE IF EXISTS system_flags")
+            cursor.execute("DROP TABLE IF EXISTS users")
+            conn.commit()
+
         # Users table
+
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
