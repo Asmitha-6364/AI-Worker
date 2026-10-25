@@ -131,9 +131,31 @@ When facing ambiguity, an autonomous agent should never guess:
 
 ---
 
-## 7. Next Steps & Production Roadmap
+## 7. Technical Stack and External Services
 
-1. **Multi-Modal Vision Inspection**: Pass real-time page screenshots to multimodal LLMs (e.g. Gemini 1.5 Pro) to perceive visual layout anomalies, canvas controls, and CAPTCHAs.
-2. **Subagent Delegation**: For large document batches (100+ invoices), instantiate specialized subagents to extract PDFs in parallel while a submission subagent queues entries into AcmeOps.
-3. **Self-Healing Selectors**: Use vector similarity over DOM embeddings to automatically repair broken CSS selectors when web app frontends undergo redesigns.
-4. **Interactive Web Dashboard**: Upgrade the terminal CLI to a live web-based control room where human reviewers can approve high-value invoices with one click.
+- **Language/runtime:** Python 3.10 or newer.
+- **Web app/API:** FastAPI, Uvicorn, Jinja2 templates, Pydantic, and SQLite.
+- **Browser automation:** Playwright with local Chromium.
+- **Document handling:** PyMuPDF for PDF text extraction and Pillow for image handling. Extraction uses local text/layout heuristics rather than general-purpose OCR.
+- **Agent/model integration:** The OpenAI Python SDK and tool calling, using OpenAI models (default `gpt-4o`) or Google's OpenAI-compatible Gemini API (default `gemini-1.5-pro`). The deterministic planner needs no model or API key.
+- **Supporting libraries:** HTTPX, Rich, `python-dotenv`, `python-multipart`, and pytest.
+- **External services:** None are required for local deterministic runs. Using OpenAI or Gemini requires network access and sends planner prompts and task context to the configured provider.
+
+## 8. Key Design Decisions and Assumptions
+
+### Design Decisions
+
+- Keep a deterministic planner so demos and tests do not depend on external model availability or credentials.
+- Use a local FastAPI + SQLite AcmeOps application as a reproducible ERP-like target rather than requiring access to a real enterprise system.
+- Exercise the real browser flow with Playwright and use an authenticated REST API fallback for the deliberately injected UI failure.
+- Independently verify persisted invoice facts instead of trusting a successful tool response.
+- Ask a human to resolve ambiguous invoice matches rather than selecting a financial record without guidance.
+- Persist structured JSON and HTML execution traces so actions and outcomes can be inspected.
+
+### Assumptions
+
+- The target is the included local AcmeOps demo, not a production accounting or ERP system.
+- Invoice files are available in the repository's `documents/` directory and follow formats the included parser heuristics can handle.
+- Chromium can run locally, and the configured host and port (`127.0.0.1:8000` by default) are available.
+- Sample credentials and the default secret key are for local demonstration only and must be changed before any non-demo deployment.
+- The deterministic planner covers the included demo flows; it is not a general-purpose substitute for model-based planning.
